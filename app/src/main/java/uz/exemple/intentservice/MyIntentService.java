@@ -29,7 +29,6 @@ public class MyIntentService extends IntentService {
     private boolean mIsSuccess;
     private boolean mIsStopped;
 
-    private Handler mHandler;
 
     public MyIntentService() {
         super("my_intentService");
@@ -68,34 +67,20 @@ public class MyIntentService extends IntentService {
         super.onDestroy();
 
     }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mHandler = new Handler();
-        return super.onStartCommand(intent, flags, startId);
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Service is running",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
 
         int tm = intent.getIntExtra("time", 0);
         String label = intent.getStringExtra("task");
-
+        Toast.makeText(getApplicationContext(),label,Toast.LENGTH_LONG).show();
         Log.d(TAG, "onHandleIntent start: " + label);
-        // возвращаем результат
+
         Intent responseIntent = new Intent();
         responseIntent.setAction(ACTION_MYINTENTSERVICE);
         responseIntent.addCategory(Intent.CATEGORY_DEFAULT);
         responseIntent.putExtra(EXTRA_KEY_OUT, label);
         sendBroadcast(responseIntent);
-        for (int i = 0; i <= 10; i++) {
+        for (int i = 0; i <= tm; i++) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -104,7 +89,7 @@ public class MyIntentService extends IntentService {
             if(mIsStopped){
                 break;
             }
-            // посылаем промежуточные данные
+
             Intent updateIntent = new Intent();
             updateIntent.setAction(ACTION_UPDATE);
             updateIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -112,9 +97,8 @@ public class MyIntentService extends IntentService {
             sendBroadcast(updateIntent);
 
             mIsSuccess = true;
-            // формируем уведомление
-            String notificationText = String.valueOf((100 * i / 10))
-                    + " %";
+
+            String notificationText = String.valueOf((100 * i / 10)) + " %";
             Notification notification = new Notification.Builder(getApplicationContext())
                     .setContentTitle("Progress")
                     .setContentText(notificationText)
@@ -128,25 +112,5 @@ public class MyIntentService extends IntentService {
         }
 
         Log.d(TAG, "onHandleIntent end: " + label);
-
-
-
-
-
-    /*int tm = intent.getIntExtra("time", 0);
-        String label = intent.getStringExtra("task");
-        Log.d(TAG, "onHandleIntent start: " + label);
-        try {
-            TimeUnit.SECONDS.sleep(tm);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "onHandleIntent end: " + label);
-
-        Intent responseIntent = new Intent();
-        responseIntent.setAction(ACTION_MYINTENTSERVICE);
-        responseIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        responseIntent.putExtra(EXTRA_KEY_OUT, extraOut);
-        sendBroadcast(responseIntent);*/
     }
 }

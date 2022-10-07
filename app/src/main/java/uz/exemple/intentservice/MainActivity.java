@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    final private static String TAG = "Int";
+    final private static String TAG = "Intent";
     private TextView mInfoTextView;
     private ProgressBar mProgressBar;
 
@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Intent mMyServiceIntent;
     private int mNumberOfIntentService;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         initViews();
     }
     void initViews(){
+
         mInfoTextView = findViewById(R.id.textView);
         mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
 
@@ -46,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mNumberOfIntentService++;
 
-                // Запускаем свой IntentService
                 mMyServiceIntent = new Intent(MainActivity.this, MyIntentService.class);
 
                 startService(mMyServiceIntent.putExtra("time", 5).putExtra("task",
@@ -72,17 +73,19 @@ public class MainActivity extends AppCompatActivity {
         mMyBroadcastReceiver = new MyBroadcastReceiver();
         mUpdateBroadcastReceiver = new UpdateBroadcastReceiver();
 
-        // регистрируем BroadcastReceiver
-        IntentFilter intentFilter = new IntentFilter(
-                MyIntentService.ACTION_MYINTENTSERVICE);
+
+        IntentFilter intentFilter = new IntentFilter(MyIntentService.ACTION_MYINTENTSERVICE);
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mMyBroadcastReceiver, intentFilter);
 
-        // Регистрируем второй приёмник
-        IntentFilter updateIntentFilter = new IntentFilter(
-                MyIntentService.ACTION_UPDATE);
+
+        IntentFilter updateIntentFilter = new IntentFilter(MyIntentService.ACTION_UPDATE);
         updateIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mUpdateBroadcastReceiver, updateIntentFilter);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
     @Override
     protected void onDestroy() {
@@ -95,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String result = intent
-                    .getStringExtra(MyIntentService.EXTRA_KEY_OUT);
+            String result = intent.getStringExtra(MyIntentService.EXTRA_KEY_OUT);
             mInfoTextView.setText(result);
         }
     }
@@ -105,8 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            int update = intent
-                    .getIntExtra(MyIntentService.EXTRA_KEY_UPDATE, 0);
+            int update = intent.getIntExtra(MyIntentService.EXTRA_KEY_UPDATE, 0);
             mProgressBar.setProgress(update);
         }
     }
